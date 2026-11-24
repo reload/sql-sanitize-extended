@@ -13,6 +13,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
+use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
 
 /**
  * Cases that need comments on top of users and content.
@@ -37,6 +38,21 @@ final class CommentsTest extends SanitizeKernelTestBase {
     $this->sanitize(stageClasses: [EntityTypeEmptier::class]);
 
     $this->assertSame(0, $this->rowCount('comment_field_data'));
+  }
+
+  public function testCommentStatisticsAreReset(): void {
+    // Core's install hook sets this; kernel tests do not run it.
+    $this->container->get('state')->set('comment.maintain_entity_statistics', TRUE);
+    $comment = $this->createCommentOnNewNode((int) $this->createUser('deletedNodeOwner')->id());
+    $this->assertSame(1, $this->rowCount('comment_entity_statistics', ['entity_id' => $comment->getCommentedEntityId(), 'comment_count' => 1]));
+
+    $this->sanitize(stageClasses: [EntityTypeEmptier::class, ReferenceReassigner::class]);
+
+    $statistics = $this->container->get('database')->select('comment_entity_statistics', 's')
+      ->fields('s', ['comment_count', 'last_comment_uid'])
+      ->condition('s.entity_id', $comment->getCommentedEntityId())
+      ->execute()->fetchAssoc();
+    $this->assertEquals(['comment_count' => 0, 'last_comment_uid' => 0], $statistics);
   }
 
   private function createCommentOnNewNode(int $nodeOwnerUid = self::ADMINISTRATOR_UID): CommentInterface {

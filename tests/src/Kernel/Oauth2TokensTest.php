@@ -7,6 +7,7 @@ namespace Drupal\Tests\sql_sanitize_extended\Kernel;
 use Drupal\consumers\Entity\Consumer;
 use Drupal\simple_oauth\Entity\Oauth2Token;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
+use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
 
 final class Oauth2TokensTest extends SanitizeKernelTestBase {
 
@@ -28,6 +29,15 @@ final class Oauth2TokensTest extends SanitizeKernelTestBase {
     $this->sanitize(stageClasses: [EntityTypeEmptier::class]);
 
     $this->assertSame(0, $this->rowCount('oauth2_token'));
+  }
+
+  public function testConsumerOwnedByDeletedUserIsReassignedToAnonymous(): void {
+    $consumer = Consumer::create(['label' => 'Consumer of deleted user', 'client_id' => 'consumerOfDeletedUser', 'user_id' => $this->createUser('deletedOwner')->id()]);
+    $consumer->save();
+
+    $this->sanitize(stageClasses: [ReferenceReassigner::class]);
+
+    $this->assertSame(self::ANONYMOUS_UID, (int) Consumer::load($consumer->id())->get('user_id')->target_id);
   }
 
 }

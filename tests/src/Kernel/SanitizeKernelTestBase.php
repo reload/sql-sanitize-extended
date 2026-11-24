@@ -58,6 +58,10 @@ abstract class SanitizeKernelTestBase extends KernelTestBase {
     }
   }
 
+  protected function guard(?Configuration $configuration = NULL): void {
+    $this->factory()->guard($configuration ?? new Configuration(), $this->logger)->run();
+  }
+
   protected function factory(): SanitizerFactory {
     return $this->container->get(SanitizerFactory::class);
   }

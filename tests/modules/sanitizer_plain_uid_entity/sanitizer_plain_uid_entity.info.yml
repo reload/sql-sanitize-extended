@@ -1,0 +1,6 @@
+---
+name: Sanitizer plain uid entity
+type: module
+description: Entity type with a plain integer uid field, for the guard tests.
+package: Testing
+core_version_requirement: ^11

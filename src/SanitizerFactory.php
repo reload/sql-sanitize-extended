@@ -7,10 +7,13 @@ namespace Drupal\sql_sanitize_extended;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
 use Drupal\sql_sanitize_extended\Stage\FieldEmptier;
+use Drupal\sql_sanitize_extended\Stage\Guard;
 use Drupal\sql_sanitize_extended\Stage\KeptAccounts;
+use Drupal\sql_sanitize_extended\Stage\NamedUserIdColumns;
 use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
 use Drupal\sql_sanitize_extended\Stage\TableEmptier;
 use Drupal\sql_sanitize_extended\Stage\UnusedFileDeleter;
@@ -29,6 +32,7 @@ final class SanitizerFactory {
     private readonly Connection $connection,
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityFieldManagerInterface $entityFieldManager,
+    private readonly ModuleHandlerInterface $moduleHandler,
     private readonly FieldTypePluginManagerInterface $fieldTypeManager,
   ) {
   }
@@ -50,6 +54,17 @@ final class SanitizerFactory {
       new UnusedFileDeleter($this->connection, $this->entityFieldManager, $this->fieldTypeManager, $contentEntityTypes, $batchDeleter, $logger),
       new TableEmptier($this->connection, $logger, $configuration),
     ];
+  }
+
+  public function guard(Configuration $configuration, LoggerInterface $logger): Guard {
+    $contentEntityTypes = new SqlContentEntityTypes($this->entityTypeManager);
+    return new Guard(
+      $this->connection,
+      new Finder($this->connection, new CandidateReader($this->connection, $contentEntityTypes, $this->entityFieldManager)),
+      new NamedUserIdColumns($this->connection, $this->moduleHandler, $this->entityFieldManager, $contentEntityTypes),
+      $logger,
+      $configuration,
+    );
   }
 
 }

@@ -1,0 +1,6 @@
+---
+name: Sanitizer declared uid table
+type: module
+description: Declares a table with a user id column, for the guard tests.
+package: Testing
+core_version_requirement: ^11

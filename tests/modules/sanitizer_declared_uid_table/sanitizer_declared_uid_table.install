@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @file
+ * Install hooks of the sanitizer test schema module.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function sanitizer_declared_uid_table_schema(): array {
+  return [
+    'declared_uid_table' => [
+      'fields' => ['uid' => ['type' => 'int', 'not null' => TRUE]],
+    ],
+  ];
+}

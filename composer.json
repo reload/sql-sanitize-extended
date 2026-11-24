@@ -1,0 +1,83 @@
+{
+    "name": "reload/sql_sanitize_extended",
+    "description": "Extends drush sql:sanitize: deletes users and removes potentially personal data.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": "^8.3",
+        "drupal/core": "^11.4"
+    },
+    "require-dev": {
+        "composer/installers": "^2.3",
+        "drupal/coder": "^8.3.30 || ^9.0",
+        "drupal/core-composer-scaffold": "^11.4",
+        "drupal/core-dev": "^11.4",
+        "drupal/core-recommended": "^11.4",
+        "drupal/flag": "^4.0@beta",
+        "drupal/group": "^3.3",
+        "drupal/simple_oauth": "^6.1",
+        "drupal/webform": "^6.3@beta",
+        "drush/drush": "^13.7",
+        "mglaman/phpstan-drupal": "^2.0",
+        "phpstan/phpstan": "^2.1"
+    },
+    "conflict": {
+        "drush/drush": "<13.7"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "vendor-dir": "drupal/vendor",
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/installers": true,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true,
+            "tbachert/spi": true,
+            "symfony/runtime": true
+        }
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "project-root": "drupal/",
+                "web-root": "drupal/web/"
+            }
+        },
+        "installer-paths": {
+            "drupal/web/core": [
+                "type:drupal-core"
+            ],
+            "drupal/web/libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "drupal/web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "drupal/web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "drupal/web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drupal/recipes/{$name}": [
+                "type:drupal-recipe"
+            ]
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "mkdir -p drupal/web/modules/sql_sanitize_extended drupal/web/sites/simpletest",
+            "for item in src tests *.yml; do ln -sfn ../../../../$item drupal/web/modules/sql_sanitize_extended/$item; done"
+        ]
+    }
+}

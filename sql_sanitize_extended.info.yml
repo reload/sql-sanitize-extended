@@ -1,0 +1,5 @@
+name: SQL sanitize extended
+type: module
+description: 'Extends drush sql:sanitize: deletes users and removes potentially personal data.'
+package: Development
+core_version_requirement: ^11.4

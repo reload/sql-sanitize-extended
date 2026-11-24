@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="sql_sanitize_extended">
+  <description>Drupal coding standards for the module and its tests.</description>
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme,info,yml"/>
+  <file>src</file>
+  <file>tests</file>
+  <rule ref="DrupalPractice"/>
+  <!-- PHPStan array shapes live in type-only doc blocks; the sniffs demand prose that only repeats the code. -->
+  <rule ref="Drupal">
+    <exclude name="Drupal.Commenting.FunctionComment"/>
+    <exclude name="Drupal.Commenting.ClassComment"/>
+    <exclude name="Drupal.Commenting.DocComment"/>
+    <exclude name="Drupal.Commenting.VariableComment"/>
+    <exclude name="Drupal.Arrays.Array.LongLineDeclaration"/>
+    <!-- The only interface is Stage, in the Stage namespace; a suffix repeats it. -->
+    <exclude name="Generic.NamingConventions.InterfaceNameSuffix"/>
+  </rule>
+</ruleset>

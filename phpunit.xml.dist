@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="drupal/web/core/tests/bootstrap.php"
+         colors="true"
+         failOnWarning="true"
+         beStrictAboutOutputDuringTests="true">
+  <php>
+    <ini name="error_reporting" value="32767"/>
+    <ini name="memory_limit" value="-1"/>
+    <env name="SIMPLETEST_BASE_URL" value="http://localhost"/>
+    <env name="BROWSERTEST_OUTPUT_DIRECTORY" value="/tmp"/>
+    <env name="SIMPLETEST_DB" value="sqlite://localhost/sites/simpletest/sql_sanitize_extended.sqlite"/>
+  </php>
+  <testsuites>
+    <testsuite name="unit">
+      <directory>tests/src/Unit</directory>
+    </testsuite>
+    <testsuite name="kernel">
+      <directory>tests/src/Kernel</directory>
+    </testsuite>
+    <testsuite name="functional">
+      <directory>tests/src/Functional</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>src</directory>
+    </include>
+  </source>
+</phpunit>

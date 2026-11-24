@@ -7,10 +7,12 @@ namespace Drupal\sql_sanitize_extended;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
 use Drupal\sql_sanitize_extended\Stage\FieldEmptier;
 use Drupal\sql_sanitize_extended\Stage\KeptAccounts;
 use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
+use Drupal\sql_sanitize_extended\Stage\UnusedFileDeleter;
 use Drupal\sql_sanitize_extended\Stage\UserDeleter;
 use Drupal\sql_sanitize_extended\Stage\WebformSubmissionEmptier;
 use Drupal\sql_sanitize_extended\UserReference\CandidateReader;
@@ -26,6 +28,7 @@ final class SanitizerFactory {
     private readonly Connection $connection,
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityFieldManagerInterface $entityFieldManager,
+    private readonly FieldTypePluginManagerInterface $fieldTypeManager,
   ) {
   }
 
@@ -43,6 +46,7 @@ final class SanitizerFactory {
       new FieldEmptier($this->connection, $this->entityFieldManager, $contentEntityTypes, $logger, $configuration),
       new ReferenceReassigner($this->connection, $this->entityTypeManager, $contentEntityTypes, $userReferenceFinder, $keptAccounts, $logger),
       new UserDeleter($this->connection, $this->entityTypeManager, $contentEntityTypes, $batchDeleter, $userReferenceFinder, $keptAccounts, $logger),
+      new UnusedFileDeleter($this->connection, $this->entityFieldManager, $this->fieldTypeManager, $contentEntityTypes, $batchDeleter, $logger),
     ];
   }
 

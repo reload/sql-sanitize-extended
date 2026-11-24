@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sql_sanitize_extended\Kernel;
 
+use Drupal\file\Entity\File;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
+use Drupal\sql_sanitize_extended\Stage\UnusedFileDeleter;
 use Drupal\webform\Entity\Webform;
 use Drupal\webform\Entity\WebformSubmission;
 
@@ -80,6 +82,35 @@ final class WebformSubmissionsTest extends SanitizeKernelTestBase {
     $this->sanitize(stageClasses: [EntityTypeEmptier::class]);
 
     $this->assertSame(0, $this->rowCount('webform_submission'));
+  }
+
+  public function testFileOfSubmissionIsDeletedWhenWebformKeepsFiles(): void {
+    $this->config('webform.settings')
+      ->set('file.make_unused_managed_files_temporary', FALSE)
+      ->set('file.delete_temporary_managed_files', FALSE)
+      ->save();
+    $this->createWebformWithRecordingHandler('webform_with_handler');
+    file_put_contents('public://upload.txt', 'private');
+    $file = File::create(['uri' => 'public://upload.txt', 'uid' => self::ADMINISTRATOR_UID, 'status' => 0]);
+    $file->save();
+    $this->submit('webform_with_handler', self::ADMINISTRATOR_UID, ['name' => 'Ada', 'attachment' => $file->id()]);
+
+    $this->sanitize(stageClasses: [EntityTypeEmptier::class, UnusedFileDeleter::class]);
+
+    $this->assertNull(File::load($file->id()));
+  }
+
+  public function testFileAlsoUsedByNodeSurvives(): void {
+    $this->createWebformWithRecordingHandler('webform_with_handler');
+    file_put_contents('public://upload.txt', 'shared');
+    $file = File::create(['uri' => 'public://upload.txt', 'uid' => self::ADMINISTRATOR_UID, 'status' => 1]);
+    $file->save();
+    $this->container->get('file.usage')->add($file, 'node', 'node', self::ADMINISTRATOR_UID);
+    $this->submit('webform_with_handler', self::ADMINISTRATOR_UID, ['name' => 'Ada', 'attachment' => $file->id()]);
+
+    $this->sanitize(stageClasses: [EntityTypeEmptier::class, UnusedFileDeleter::class]);
+
+    $this->assertNotNull(File::load($file->id()));
   }
 
   public function testSubmissionAndItsDataOfDeletedWebformAreDeleted(): void {

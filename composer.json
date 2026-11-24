@@ -13,7 +13,7 @@
         "drupal/core-composer-scaffold": "^11.4",
         "drupal/core-dev": "^11.4",
         "drupal/core-recommended": "^11.4",
-        "drupal/flag": "^4.0@beta",
+        "drupal/flag": "^5.2@beta",
         "drupal/group": "^3.3",
         "drupal/simple_oauth": "^6.1",
         "drupal/webform": "^6.3@beta",

@@ -1,0 +1,3 @@
+services:
+  Drupal\sql_sanitize_extended\SanitizerFactory:
+    autowire: true

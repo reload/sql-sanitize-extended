@@ -12,8 +12,10 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\sql_sanitize_extended\Configuration;
 use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
 use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
+use Drupal\sql_sanitize_extended\Stage\UserDeleter;
 
 /**
  * Cases that need comments on top of users and content.
@@ -30,6 +32,26 @@ final class CommentsTest extends SanitizeKernelTestBase {
     $this->installSchema('comment', ['comment_entity_statistics']);
     $this->installConfig(['node', 'comment']);
     NodeType::create(['type' => 'plain_bundle', 'name' => 'plain_bundle'])->save();
+  }
+
+  public function testKeptCommentOnDeletedUserIsDeleted(): void {
+    CommentType::create(['id' => 'comment_on_user', 'label' => 'Comment on user', 'target_entity_type_id' => 'user'])->save();
+    FieldStorageConfig::create(['field_name' => 'comment_on_user', 'entity_type' => 'user', 'type' => 'comment', 'settings' => ['comment_type' => 'comment_on_user']])->save();
+    FieldConfig::create(['field_name' => 'comment_on_user', 'entity_type' => 'user', 'bundle' => 'user'])->save();
+    $deletedSubject = $this->createUser('deletedSubject');
+    Comment::create([
+      'entity_type' => 'user',
+      'entity_id' => $deletedSubject->id(),
+      'field_name' => 'comment_on_user',
+      'comment_type' => 'comment_on_user',
+      'uid' => self::ADMINISTRATOR_UID,
+      'status' => 1,
+      'subject' => 'Hello',
+    ])->save();
+
+    $this->sanitize(new Configuration(allowlistEntityTypes: ['comment']), [UserDeleter::class]);
+
+    $this->assertSame(0, $this->rowCount('comment_field_data'));
   }
 
   public function testCommentsAreEmptied(): void {

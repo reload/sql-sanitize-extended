@@ -11,6 +11,7 @@ use Drupal\sql_sanitize_extended\Stage\EntityTypeEmptier;
 use Drupal\sql_sanitize_extended\Stage\FieldEmptier;
 use Drupal\sql_sanitize_extended\Stage\KeptAccounts;
 use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
+use Drupal\sql_sanitize_extended\Stage\UserDeleter;
 use Drupal\sql_sanitize_extended\Stage\WebformSubmissionEmptier;
 use Drupal\sql_sanitize_extended\UserReference\CandidateReader;
 use Drupal\sql_sanitize_extended\UserReference\Finder;
@@ -41,6 +42,7 @@ final class SanitizerFactory {
       new EntityTypeEmptier($this->entityTypeManager, $contentEntityTypes, $batchDeleter, new WebformSubmissionEmptier($this->entityTypeManager, $this->connection, $batchDeleter), $logger, $configuration),
       new FieldEmptier($this->connection, $this->entityFieldManager, $contentEntityTypes, $logger, $configuration),
       new ReferenceReassigner($this->connection, $this->entityTypeManager, $contentEntityTypes, $userReferenceFinder, $keptAccounts, $logger),
+      new UserDeleter($this->connection, $this->entityTypeManager, $contentEntityTypes, $batchDeleter, $userReferenceFinder, $keptAccounts, $logger),
     ];
   }
 

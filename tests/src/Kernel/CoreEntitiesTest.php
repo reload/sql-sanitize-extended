@@ -13,6 +13,7 @@ use Drupal\sql_sanitize_extended\Configuration;
 use Drupal\user\Entity\Role;
 use Drupal\sql_sanitize_extended\Stage\FieldEmptier;
 use Drupal\sql_sanitize_extended\Stage\ReferenceReassigner;
+use Drupal\sql_sanitize_extended\Stage\UserDeleter;
 
 /**
  * Cases that only need core: users and content.
@@ -133,6 +134,16 @@ final class CoreEntitiesTest extends SanitizeKernelTestBase {
     $this->sanitize(stageClasses: [ReferenceReassigner::class]);
 
     $this->assertSame(self::ANONYMOUS_UID, (int) Node::load($node->id())->get('field_required_reference')->target_id);
+  }
+
+  public function testKeptTestAccountIsNotSanitized(): void {
+    $keptTestAccount = $this->createUser('keptTestAccount');
+    $passwordHash = $keptTestAccount->getPassword();
+
+    $this->sanitize(new Configuration(keptUserNames: ['keptTestAccount']), [UserDeleter::class]);
+
+    $keptTestAccount = $this->container->get('entity_type.manager')->getStorage('user')->load($keptTestAccount->id());
+    $this->assertSame(['keptTestAccount@example.com', $passwordHash], [$keptTestAccount->getEmail(), $keptTestAccount->getPassword()]);
   }
 
   public function testNodeOwnedByUserWithIgnoredRoleKeepsItsOwner(): void {

@@ -1,0 +1,64 @@
+---
+name: Lint
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: GitHub Actions
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: composer lint:actions
+  markdownlint:
+    name: Markdown
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: composer lint:markdown
+  yamllint:
+    name: YAML
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: composer lint:yaml
+  commitlint:
+    name: Commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The base branch too, to find the commits the pull request adds.
+          fetch-depth: 0
+      - run: composer lint:commits
+        env:
+          COMMITLINT_FROM: origin/${{ github.base_ref }}
+  phpcs:
+    name: PHP_CodeSniffer
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+      - uses: ramsey/composer-install@v4
+      - run: drupal/vendor/bin/phpcs
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd
+      - uses: ramsey/composer-install@v4
+      - run: drupal/vendor/bin/phpstan analyse --memory-limit=1G

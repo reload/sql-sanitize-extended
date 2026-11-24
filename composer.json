@@ -78,6 +78,23 @@
         "post-autoload-dump": [
             "mkdir -p drupal/web/modules/sql_sanitize_extended drupal/web/sites/simpletest",
             "for item in src tests *.yml; do ln -sfn ../../../../$item drupal/web/modules/sql_sanitize_extended/$item; done"
-        ]
+        ],
+        "lint": [
+            "@lint:markdown",
+            "@lint:yaml",
+            "@lint:actions",
+            "@lint:commits"
+        ],
+        "lint:markdown": "docker compose run --rm markdownlint $(git ls-files '*.md')",
+        "lint:yaml": "docker compose run --rm yamllint --strict .",
+        "lint:actions": "docker compose run --rm actionlint -color",
+        "lint:commits": "docker compose run --rm commitlint --from \"${COMMITLINT_FROM:-main}\" --to HEAD --verbose"
+    },
+    "scripts-descriptions": {
+        "lint": "Run all linters in Docker",
+        "lint:markdown": "Lint the Markdown files",
+        "lint:yaml": "Lint the YAML files",
+        "lint:actions": "Lint the GitHub Actions workflows",
+        "lint:commits": "Lint the commit messages since COMMITLINT_FROM (default main)"
     }
 }

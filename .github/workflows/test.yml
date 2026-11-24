@@ -1,0 +1,47 @@
+---
+name: Test
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }}, Drupal ${{ matrix.drupal }}, Drush ${{ matrix.drush }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The lowest versions composer.json allows.
+          - php: '8.3'
+            drupal: '~11.4.0'
+            drush: '~13.7.0'
+          # The newest releases the constraints allow.
+          - php: '8.5'
+            drupal: '^11.4'
+            drush: '^13'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, pdo_sqlite
+      - name: Install dependencies
+        run: |
+          composer require --dev --no-update \
+            "drupal/core-recommended:${{ matrix.drupal }}" \
+            "drupal/core-dev:${{ matrix.drupal }}" \
+            "drush/drush:${{ matrix.drush }}"
+          composer update --no-interaction --prefer-dist
+          drupal/vendor/bin/drush --version
+      - name: Unit tests
+        run: drupal/vendor/bin/phpunit --testsuite unit
+      - name: Kernel tests
+        run: drupal/vendor/bin/phpunit --testsuite kernel
+      - name: Functional tests
+        run: drupal/vendor/bin/phpunit --testsuite functional

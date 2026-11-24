@@ -1,3 +1,4 @@
+---
 name: SQL sanitize extended
 type: module
 description: 'Extends drush sql:sanitize: deletes users and removes potentially personal data.'

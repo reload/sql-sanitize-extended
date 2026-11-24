@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Evicts webforms from the entity cache while submissions load.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_entity_storage_load().
+ */
+function sanitizer_recording_handler_entity_storage_load(array $entities, string $entity_type_id): void {
+  if ($entity_type_id === 'webform_submission' && \Drupal::state()->get('sanitizer_recording_handler.evict_webforms')) {
+    \Drupal::entityTypeManager()->getStorage('webform')->resetCache();
+  }
+}

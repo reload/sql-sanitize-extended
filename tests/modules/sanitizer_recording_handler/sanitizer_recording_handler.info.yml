@@ -1,0 +1,8 @@
+---
+name: Sanitizer recording handler
+type: module
+description: Webform handler that records deletes, for the sanitizer tests.
+package: Testing
+core_version_requirement: ^11
+dependencies:
+  - webform:webform

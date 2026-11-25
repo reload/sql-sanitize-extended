@@ -30,7 +30,7 @@ final class StepsListener {
 
   public function __invoke(ConsoleTerminateEvent $event): void {
     $options = $event->getInput()->getOptions();
-    if (!Activation::shouldRun($event->getCommand()?->getName(), $event->getExitCode(), $options)) {
+    if (!Activation::shouldRun($event->getCommand()?->getName(), $event->getExitCode(), $event->getInterruptingSignal(), $options)) {
       return;
     }
     foreach ($this->factory->stages(Configuration::fromOptions($options), $this->logger) as $stage) {

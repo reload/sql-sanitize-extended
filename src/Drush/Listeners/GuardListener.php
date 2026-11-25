@@ -31,7 +31,7 @@ final class GuardListener {
 
   public function __invoke(ConsoleTerminateEvent $event): void {
     $options = $event->getInput()->getOptions();
-    if (!Activation::shouldRun($event->getCommand()?->getName(), $event->getExitCode(), $options)) {
+    if (!Activation::shouldRun($event->getCommand()?->getName(), $event->getExitCode(), $event->getInterruptingSignal(), $options)) {
       return;
     }
     $this->factory->guard(Configuration::fromOptions($options), $this->logger)->run();

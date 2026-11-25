@@ -1,3 +1,9 @@
+## [0.3.0](https://github.com/reload/sql-sanitize-extended/compare/v0.2.0...v0.3.0) (2026-11-25)
+
+### Features
+
+* read --sanitize-extended as a boolean and reject other values ([71cc483](https://github.com/reload/sql-sanitize-extended/commit/71cc4838ae55a7f299a01790bf095d4dc365e331))
+
 ## [0.2.0](https://github.com/reload/sql-sanitize-extended/compare/v0.1.1...v0.2.0) (2026-11-25)
 
 ### Features

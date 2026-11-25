@@ -70,6 +70,7 @@ final class SanitizeExtendedTest extends BrowserTestBase {
   }
 
   public function testSanitizeExtendedNoInEnvironmentSkipsEverything(): void {
+    // Invalid, so the run only passes if nothing is validated.
     $this->drush('sql:sanitize', [], ['empty-fields' => 'malformed'], env: ['DRUSH_COMMAND_SQL_SANITIZE_OPTIONS_SANITIZE_EXTENDED' => 'no']);
 
     $this->assertSame(['leaver', 'keptByName', 'keptByRole'], $this->userNamesAboveUidOne());

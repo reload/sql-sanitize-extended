@@ -143,8 +143,8 @@ DRUSH_COMMAND_SQL_SANITIZE_OPTIONS_SANITIZE_EXTENDED=no
 
 - Write `no`. Drush reads an environment variable of `0` as unset.
 - A `sanitize-extended` value in the project's or the site's
-  `drush.yml` overrides the variable, and so does the option on the
-  command line.
+  `drush.yml` or in the site alias overrides the variable, and so does
+  the option on the command line.
 - Core's own sanitize still runs; only the module is off.
 
 ## Development

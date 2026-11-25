@@ -85,7 +85,7 @@
             "@lint:actions",
             "@lint:commits"
         ],
-        "lint:markdown": "docker compose run --rm markdownlint $(git ls-files '*.md')",
+        "lint:markdown": "docker compose run --rm markdownlint $(git ls-files '*.md' ':!:CHANGELOG.md')",
         "lint:yaml": "docker compose run --rm yamllint --strict .",
         "lint:actions": "docker compose run --rm actionlint -color",
         "lint:commits": "docker compose run --rm commitlint --from \"${COMMITLINT_FROM:-main}\" --to HEAD --verbose"

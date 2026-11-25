@@ -90,7 +90,7 @@ When the module is installed, `drush sql:sanitize` has these options:
 
 | Option | Meaning |
 | --- | --- |
-| `--sanitize-extended=no` | Turns off the steps, the guard and the prompt lines. `0` does too. In `drush.yml` write `sanitize-extended: no`; an unquoted `0` or `false` fails with a TypeError, as for core's own `sanitize-*` options |
+| `--sanitize-extended=no` | Turns off the steps, the guard and the prompt lines. `false`, `off` and `0` do too, in any case. A value that is not yes or no fails the run before the prompt. In `drush.yml` write `sanitize-extended: no`; an unquoted `0` or `false` fails with a TypeError, as for core's own `sanitize-*` options |
 | `--kept-user-names` | Users kept by name, ignoring case |
 | `--allowlist-tables` | Default tables to leave alone |
 | `--allowlist-entity-types` | Default entity types to leave alone |
@@ -131,6 +131,23 @@ Invalid options fail the run before the prompt, before anything changes:
 - A list that is not a comma-separated string.
 
 With `--sanitize-extended=no` nothing is validated.
+
+### Turning the module off in an environment
+
+The module is on wherever it is enabled, production too, where an
+accidental `drush sql:sanitize -y` would delete users. Turn it off
+there with an environment variable:
+
+```shell
+DRUSH_COMMAND_SQL_SANITIZE_OPTIONS_SANITIZE_EXTENDED=no
+```
+
+- Write `no`, `false` or `off`, not `0`: Drush reads an environment
+  variable of `0` as unset.
+- A `sanitize-extended` value in the project's or the site's
+  `drush.yml` or in the site alias overrides the variable, and so does
+  the option on the command line.
+- Core's own sanitize still runs; only the module is off.
 
 ## Development
 

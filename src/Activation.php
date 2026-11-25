@@ -35,10 +35,17 @@ final class Activation {
   }
 
   /**
-   * Off for `no` and `0`, as core's switches are.
+   * On when unset; otherwise PHP's boolean words, ignoring case.
+   *
+   * Anything else throws, so a typo in the switch that keeps the module off in
+   * production fails the run instead of turning the module on.
    */
   private static function isOn(?string $optionValue): bool {
-    return $optionValue != 'no' && $optionValue != '0';
+    if ($optionValue === NULL) {
+      return TRUE;
+    }
+    return filter_var($optionValue, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+      ?? throw new \InvalidArgumentException(sprintf('Invalid sql:sanitize option --%s=%s: use yes or no.', self::OPTION, $optionValue));
   }
 
 }

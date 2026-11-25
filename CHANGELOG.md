@@ -1,3 +1,9 @@
+## [0.3.1](https://github.com/reload/sql-sanitize-extended/compare/v0.3.0...v0.3.1) (2026-11-25)
+
+### Bug Fixes
+
+* delete Group 2 memberships with their users ([5e712d5](https://github.com/reload/sql-sanitize-extended/commit/5e712d56345d9c0ddd46e8ef0e39dff1987dbe09))
+
 ## [0.3.0](https://github.com/reload/sql-sanitize-extended/compare/v0.2.0...v0.3.0) (2026-11-25)
 
 ### Features

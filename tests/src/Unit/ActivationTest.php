@@ -11,6 +11,11 @@ use PHPUnit\Framework\TestCase;
 final class ActivationTest extends TestCase {
 
   /**
+   * SIGINT; `\SIGINT` exists only with the pcntl extension.
+   */
+  private const INTERRUPTING_SIGNAL = 2;
+
+  /**
    * @return array<string, array{?string, bool}>
    */
   public static function optionValues(): array {
@@ -28,16 +33,17 @@ final class ActivationTest extends TestCase {
   }
 
   /**
-   * @return array<string, array{?string, int, array<string, mixed>, bool}>
+   * @return array<string, array{?string, int, ?int, array<string, mixed>, bool}>
    */
   public static function runs(): array {
     return [
-      'sanitize that succeeded' => ['sql:sanitize', 0, [Activation::OPTION => NULL], TRUE],
-      'option missing' => ['sql:sanitize', 0, [], TRUE],
-      'sanitize that was aborted' => ['sql:sanitize', 1, [], FALSE],
-      'another command' => ['status', 0, [], FALSE],
-      'no command' => [NULL, 0, [], FALSE],
-      'sanitize switched off' => ['sql:sanitize', 0, [Activation::OPTION => 'no'], FALSE],
+      'sanitize that succeeded' => ['sql:sanitize', 0, NULL, [Activation::OPTION => NULL], TRUE],
+      'option missing' => ['sql:sanitize', 0, NULL, [], TRUE],
+      'sanitize that was aborted' => ['sql:sanitize', 1, NULL, [], FALSE],
+      'sanitize interrupted by a signal' => ['sql:sanitize', 0, self::INTERRUPTING_SIGNAL, [], FALSE],
+      'another command' => ['status', 0, NULL, [], FALSE],
+      'no command' => [NULL, 0, NULL, [], FALSE],
+      'sanitize switched off' => ['sql:sanitize', 0, NULL, [Activation::OPTION => 'no'], FALSE],
     ];
   }
 
@@ -45,8 +51,8 @@ final class ActivationTest extends TestCase {
    * @param array<string, mixed> $options
    */
   #[DataProvider('runs')]
-  public function testActsOnlyAfterSuccessfulSanitizeThatIsNotSwitchedOff(?string $commandName, int $exitCode, array $options, bool $expected): void {
-    $this->assertSame($expected, Activation::shouldRun($commandName, $exitCode, $options));
+  public function testActsOnlyAfterSuccessfulSanitizeThatIsNotSwitchedOff(?string $commandName, int $exitCode, ?int $signal, array $options, bool $expected): void {
+    $this->assertSame($expected, Activation::shouldRun($commandName, $exitCode, $signal, $options));
   }
 
   public function testBooleanOptionValueFromConfigurationIsRejected(): void {
@@ -55,8 +61,22 @@ final class ActivationTest extends TestCase {
     Activation::isEnabled([Activation::OPTION => TRUE]);
   }
 
-  public function testOptionIsNotReadAfterAbort(): void {
-    $this->assertFalse(Activation::shouldRun('sql:sanitize', 1, [Activation::OPTION => TRUE]));
+  /**
+   * @return array<string, array{int, ?int}>
+   */
+  public static function unfinishedRuns(): array {
+    return [
+      'aborted' => [1, NULL],
+      'interrupted by a signal' => [0, self::INTERRUPTING_SIGNAL],
+    ];
+  }
+
+  /**
+   * A boolean option throws when read, so these fail if it is read first.
+   */
+  #[DataProvider('unfinishedRuns')]
+  public function testOptionIsNotReadAfterUnfinishedRun(int $exitCode, ?int $signal): void {
+    $this->assertFalse(Activation::shouldRun('sql:sanitize', $exitCode, $signal, [Activation::OPTION => TRUE]));
   }
 
 }

@@ -8,7 +8,7 @@ what core's plugins cover:
 1. Most users
 2. Entities and tables from Core and Contrib modules that may hold
    personal data
-3. Files nothing uses
+3. The database rows of files nothing uses
 
 A guard checks the final state and fails the run if a user id still
 points to a user that does not exist.
@@ -44,7 +44,8 @@ When the module is installed, `drush sql:sanitize` runs these steps:
 4. Reassign content that refers to users who are not kept to the
    anonymous user.
 5. Delete the users who are not kept.
-6. Delete files nothing uses any more.
+6. Delete the database rows of files nothing uses any more. The files
+   stay on disk.
 7. Empty tables that may contain personal data, such as logs, sessions
    and caches.
 8. The site's own sanitize listeners run.

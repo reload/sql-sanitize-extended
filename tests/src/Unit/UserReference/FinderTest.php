@@ -74,6 +74,22 @@ final class FinderTest extends TestCase {
     $this->assertSame(['group-group_membership'], $columns[0]->bundles);
   }
 
+  public function testGroupTwoMembershipIsSkipped(): void {
+    $candidate = $this->candidate([
+      'entityTypeId' => 'group_content',
+      'bundle' => 'group-group_membership',
+      'fieldName' => 'entity_id',
+      'isBaseField' => TRUE,
+      'userIdTable' => 'group_relationship_field_data',
+      'userIdColumn' => 'entity_id',
+      'bundleColumn' => 'type',
+    ]);
+
+    $columns = Finder::columns([$candidate], ['group_content' => ['group-group_membership', 'group-group_node-article']]);
+
+    $this->assertSame(Column::SKIP, $columns[0]->action);
+  }
+
   public function testFlaggingOwnerIsSkipped(): void {
     $candidate = $this->candidate(['entityTypeId' => 'flagging', 'fieldName' => 'uid', 'isBaseField' => TRUE, 'userIdTable' => 'flagging', 'userIdColumn' => 'uid']);
 

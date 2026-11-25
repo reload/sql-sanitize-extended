@@ -17,6 +17,8 @@ final class Finder {
    */
   public const SKIPPED_REFERENCES = [
     'group_relationship.entity_id',
+    // Group 2 names the entity type group_content.
+    'group_content.entity_id',
     'flagging.uid',
     'comment.entity_id',
   ];

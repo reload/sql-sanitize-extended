@@ -17,14 +17,26 @@ final class ActivationTest extends TestCase {
     return [
       'unset' => [NULL, TRUE],
       'yes' => ['yes', TRUE],
+      'one' => ['1', TRUE],
+      'true' => ['true', TRUE],
+      'on' => ['on', TRUE],
       'no' => ['no', FALSE],
+      'no in capitals' => ['NO', FALSE],
       'zero' => ['0', FALSE],
+      'false' => ['false', FALSE],
+      'off' => ['off', FALSE],
     ];
   }
 
   #[DataProvider('optionValues')]
-  public function testOnlyNoAndZeroTurnTheModuleOff(?string $optionValue, bool $expected): void {
+  public function testBooleanWordsSwitchTheModuleIgnoringCase(?string $optionValue, bool $expected): void {
     $this->assertSame($expected, Activation::isEnabled([Activation::OPTION => $optionValue]));
+  }
+
+  public function testValueThatIsNotBooleanIsRejected(): void {
+    $this->expectException(\InvalidArgumentException::class);
+
+    Activation::isEnabled([Activation::OPTION => 'nej']);
   }
 
   /**

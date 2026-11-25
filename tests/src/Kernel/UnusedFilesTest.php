@@ -26,7 +26,6 @@ final class UnusedFilesTest extends SanitizeKernelTestBase {
   }
 
   private function createFile(int $ownerUid): FileInterface {
-    file_put_contents('public://picture.png', 'private');
     $file = File::create(['uri' => 'public://picture.png', 'uid' => $ownerUid, 'status' => 1]);
     $file->save();
     return $file;
@@ -138,12 +137,22 @@ final class UnusedFilesTest extends SanitizeKernelTestBase {
     $this->assertNotNull(File::load($file->id()));
   }
 
-  public function testFileOfDeletedUserIsRemovedFromDisk(): void {
-    $file = $this->createFile((int) $this->createUser('deletedUploader')->id());
+  public function testFileWhoseRowIsDeletedStaysOnDisk(): void {
+    file_put_contents('public://picture.png', 'private');
+    $file = $this->createFile(self::UID_WITHOUT_ACCOUNT);
 
     $this->sanitize(stageClasses: [UnusedFileDeleter::class]);
 
-    $this->assertFileDoesNotExist($file->getFileUri());
+    $this->assertFileExists($file->getFileUri());
+  }
+
+  public function testUsageRowsOfDeletedFileAreDeleted(): void {
+    $file = $this->createFile(self::UID_WITHOUT_ACCOUNT);
+    $this->container->get('file.usage')->add($file, 'file', 'node', 1);
+
+    $this->sanitize(stageClasses: [UnusedFileDeleter::class]);
+
+    $this->assertSame([], $this->container->get('file.usage')->listUsage($file));
   }
 
 }

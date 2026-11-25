@@ -51,7 +51,7 @@ final class SanitizerFactory {
       new FieldEmptier($this->connection, $this->entityFieldManager, $contentEntityTypes, $logger, $configuration),
       new ReferenceReassigner($this->connection, $this->entityTypeManager, $contentEntityTypes, $userReferenceFinder, $keptAccounts, $logger),
       new UserDeleter($this->connection, $this->entityTypeManager, $contentEntityTypes, $batchDeleter, $userReferenceFinder, $keptAccounts, $logger),
-      new UnusedFileDeleter($this->connection, $this->entityFieldManager, $this->fieldTypeManager, $contentEntityTypes, $batchDeleter, $logger),
+      new UnusedFileDeleter($this->connection, $this->entityTypeManager, $this->entityFieldManager, $this->fieldTypeManager, $contentEntityTypes, $logger),
       new TableEmptier($this->connection, $logger, $configuration),
     ];
   }

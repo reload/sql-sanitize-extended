@@ -1,3 +1,9 @@
+## [0.2.0](https://github.com/reload/sql-sanitize-extended/compare/v0.1.1...v0.2.0) (2026-11-25)
+
+### Features
+
+* delete the rows of unused files and leave the files on disk ([750363d](https://github.com/reload/sql-sanitize-extended/commit/750363d93df75eb24767f9ea04633ab2a9b6b7a0))
+
 ## [0.1.1](https://github.com/reload/sql-sanitize-extended/compare/v0.1.0...v0.1.1) (2026-11-25)
 
 ### Bug Fixes
